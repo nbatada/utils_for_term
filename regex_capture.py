@@ -45,7 +45,7 @@ if __name__ == '__main__':
     #    error('If args.idx is specified, so sould args.sep and vice versa')
     if args.idx:
         if args.idx <=0: 
-            error ('Incorrect value for args.idx. It be 1-based')
+            error ('Incorrect value for args.idx. It has to be 1-based')
         else:
             args.idx -= 1 # to make it 0 indexed
     if args.sep=='\\t' or args.sep=='tab':
