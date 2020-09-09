@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     df.columns=column_names # filename is used as column name. Note: this will fail if there is more than one column
 
-    nrows=df.count(axis=0) # row count
+    ##nrows=df.count(axis=0) # row count
 
     # filter the rows
     if args.filename_keys:
@@ -81,15 +81,17 @@ if __name__ == '__main__':
         rownames_to_keep=[line.strip() for line in open(args.filename_keys).readlines()]
         remove_these=set(rownames)-set(rownames_to_keep)
         df.drop(index=remove_these, inplace=True)
+
     if args.ignore_keys_prefix:
+        df = df[df.index.startswith(args.ignore_keys_prefix)==False]
         # find all keys that starts with this prefix
-        rownames_to_discard=[]
-        for rowname in df.index:
-            if rowname.startswith(args.ignore_keys_prefix):
-                rownames_to_discard.append(rowname)
-        if len(rownames_to_discard)>0:
-            df.drop(index=rownames_to_discard, inplace=True)
-    nrows_after=df.count(axis=0)
+        ## rownames_to_discard=[]
+        ## for rowname in df.index:
+        ##    if rowname.startswith(args.ignore_keys_prefix):
+        ##        rownames_to_discard.append(rowname)
+        ## if len(rownames_to_discard)>0:
+        ##    df.drop(index=rownames_to_discard, inplace=True)
+    ##nrows_after=df.count(axis=0)
 
     df.index.name="ID" # set the header name of the rownames     
     df.sort_index(inplace=True) # sort by rownames
