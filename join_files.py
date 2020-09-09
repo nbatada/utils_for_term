@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Nizar Batada nizar.batada "-at-" gmail dot com
 # Tue Mar 17, 6pm. Allow filtering rows with certain prefixes (eg. __ambigous __too_low_aQual) that ht-seq will spit out
 # Tue Feb 11 21:32:06 2020
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     try:
         df_from_each_file=(pd.read_csv(f,index_col=0,sep='\t',header=None, usecols=[0,args.idx_to_keep]) for f in all_files)
     except ValueError:
-        error(f'Error during file reading: check if the args.idx_to_keep is correct')
+        error('Error during file reading: check if the args.idx_to_keep is correct')
 
     df = pd.concat(df_from_each_file,axis=1, sort=False).fillna( args.missing_value ) ## join="inner" 
     # axis = 0 (column down/down) and axis=1 (row/right)
@@ -77,6 +77,7 @@ if __name__ == '__main__':
 
     # filter the rows
     if args.filename_keys:
+        rownames=[k for k in df.index]
         rownames_to_keep=[line.strip() for line in open(args.filename_keys).readlines()]
         remove_these=set(rownames)-set(rownames_to_keep)
         df.drop(index=remove_these, inplace=True)
