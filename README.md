@@ -55,6 +55,7 @@ optional arguments:
 ```
 
 # Installation
-* create a bin file (`mkdir ~/bin`) and add these scripts in that folder
+* create a folder whereever you like (`mkdir ~/bin`) and add these scripts in that folder
 * add this folder to the path in your .bashrc (i.e. `export PATH=$PATH:~/bin`)
+* then `source ~/.bashrc`
 
