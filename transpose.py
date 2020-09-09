@@ -28,7 +28,7 @@ if __name__ == '__main__':
     parser.add_argument('-s','--sep',default='\t',action='store',required=False, help='delimiter separating columns [Default: \t]')
     args=parser.parse_args()
     if args.sep=='\\t' or args.sep=='tab':
-        sep='\t'
+        args.sep='\t'
 
     if args.file=='-': 
         args.file=sys.stdin

@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('-s','--sep',default='\t',action='store',required=False, help='delimiter separating columns [Default: \t]')
     args=parser.parse_args()
     if args.sep=='\\t' or args.sep=='tab':
-        sep='\t'
+        args.sep='\t'
 
     if args.idx_from <=0 or args.idx_to<=0:
         error("Error: idx_from and idx_to must be greater than 0.")
