@@ -1,15 +1,15 @@
 #!/usr/bin/env python
-# Nizar Batada
+# Nizar Batada nizar.batada "-at-" gmail dot com
 # Tue Mar 17, 6pm. Allow filtering rows with certain prefixes (eg. __ambigous __too_low_aQual) that ht-seq will spit out
 # Tue Feb 11 21:32:06 2020
 # Mon May 4, Update: fix the column labeling issue (when input has more than two columns per file (need to take one usecols)
 
-info='''This program will join tables with identical keys (first column). 
+info='''Will join tables with identical keys (first column). 
 Works similar to join but works for abitrary number of files, supports 
 filtering and limited support for filename (column name) processing.
 
 Limitation: input files must have only 2 columns (column 1 have keys and column 2 have values).
-This was intended to merge ht-seq individual sample rna-seq counts files.
+
 
 '''
 
@@ -57,18 +57,12 @@ if __name__ == '__main__':
     parser.add_argument('-m','--missing_value',default='', action='store',required=False, help='[Optional] String to represent missing value')
     args=parser.parse_args()
     args.idx_to_keep -= 1 # make it 0-indexed
-    #print(args.files)
-    #exit(-1)
-    if args.files==['-']: # Note: must specific ['-'] because nargs='*' makes this variable be a list
+    if args.files==['-']: # Note: nargs='*' variable is a list
         all_files=[f.rstrip() for f in stdin.readlines()]
     else:
         all_files=args.files
-    ## print("Number of files to join = %s"  % len(all_files)) #, file=sys.stderr)
 
-    
-    # to make the first column as rownames use index_col=0
     try:
-        #df_from_each_file=(pd.read_csv(f,index_col=0,sep='\t',header=None) for f in all_files)
         df_from_each_file=(pd.read_csv(f,index_col=0,sep='\t',header=None, usecols=[0,args.idx_to_keep]) for f in all_files)
     except ValueError:
         error(f'Error during file reading: check if the args.idx_to_keep is correct')
@@ -78,11 +72,6 @@ if __name__ == '__main__':
     column_names=cleanup_filenames(all_files,args.sep_in_filename) # file names will be used for column headers (but only works if there is one column per file)
 
     df.columns=column_names # filename is used as column name. Note: this will fail if there is more than one column
-
-    ##
-    ## need to modify ensemble names
-    ## rownames=[str(rowname).split('.')[0] for rowname in df.index] # remove ENSG version names
-    ## df.index=rownames
 
     nrows=df.count(axis=0) # row count
 
@@ -100,13 +89,10 @@ if __name__ == '__main__':
         if len(rownames_to_discard)>0:
             df.drop(index=rownames_to_discard, inplace=True)
     nrows_after=df.count(axis=0)
-    ## print("Number of rows (before filtering = %s) = %s" % (nrows,nrows_after)) #,file=sys.stderr)
 
-    # to label the header of the rownames
-    df.index.name="ID" # set the header name of the rownames     # NOTE: index=True means print rownames but then it does not pri
-
+    df.index.name="ID" # set the header name of the rownames     
     df.sort_index(inplace=True) # sort by rownames
-    df.to_csv(sys.stdout, sep='\t',index=True) # index=False to print header of rowname?
+    df.to_csv(sys.stdout, sep='\t',index=True) 
     
     
     
