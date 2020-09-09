@@ -16,8 +16,11 @@ if __name__ == '__main__':
     parser.add_argument('-f','--file',default=None,action='store',nargs=1,required=False,help='File name to read from')
     parser.add_argument('-i','--idx_from',type=int,required=True,help='index of the column to move')
     parser.add_argument('-j','--idx_to',type=int,required=True,help='index of the column to move to')
+    parser.add_argumen('-s','--sep',default='\t',action='store',required=False, help='delimiter separating columns [Default: \t]')
     args=parser.parse_args()
-    sep='\t'
+    if args.sep=='\\t' or args.sep=='tab':
+        sep='\t'
+
     if args.idx_from <=0 or args.idx_to<=0:
         error("Error: idx_from and idx_to must be greater than 0.")
     src=args.idx_from
@@ -29,7 +32,7 @@ if __name__ == '__main__':
         fp=sys.stdin
     FIRSTLINE=True
     for x in fp:
-        v=x.rstrip('\n\r').split(sep)
+        v=x.rstrip('\n\r').split(args.sep)
         v.insert(0,'0')          # so can use the 1-based indexing        
         
         if FIRSTLINE:
@@ -39,4 +42,4 @@ if __name__ == '__main__':
                 error ("idx_from and idx_to must be no greater than the number of fields (%s)" % len(v))
         temp = ':'.join(v[args.idx_from:args.idx_to+1])
         v[0]=temp
-        print(sep.join(v))
+        print(args.sep.join(v))
