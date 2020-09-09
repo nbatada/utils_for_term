@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('-f','--file',default=None,action='store',nargs=1,required=False,help='File name to read from')
     parser.add_argument('-i','--idx_from',type=int,required=True,help='index of the column to move')
     parser.add_argument('-j','--idx_to',type=int,required=True,help='index of the column to move to')
-    parser.add_argumen('-s','--sep',default='\t',action='store',required=False, help='delimiter separating columns [Default: \t]')
+    parser.add_argument('-s','--sep',default='\t',action='store',required=False, help='delimiter separating columns [Default: \t]')
     args=parser.parse_args()
     if args.sep=='\\t' or args.sep=='tab':
         sep='\t'
