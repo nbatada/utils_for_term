@@ -17,6 +17,7 @@ import pandas as pd
 import os,sys
 from sys import argv,exit,stdin,stderr,path
 import argparse
+from progressbar import ProgressBar
 from signal import signal, SIGPIPE, SIG_DFL
 signal(SIGPIPE,SIG_DFL)
 def error(str):
@@ -55,6 +56,9 @@ if __name__ == '__main__':
     parser.add_argument('-i','--ignore_keys_prefix',default=None,action='store',required=False,help='[Optional] Ignore keys (1st column) if they start with the specified prefix')
     parser.add_argument('-k','--filename_keys',default=None, action='store',required=False,help='[Optional] A file containing a list of keys (rows) to retain. Provide the keyname one per line.')
     parser.add_argument('-m','--missing_value',default='', action='store',required=False, help='[Optional] String to represent missing value')
+    parser.add_argument('-wd','--working_directory',default='.',action='store',required=False, help='[Optional] Specify in which directory the files are in')
+    parser.add_argument('-n','--file_name_as_header',action='store_true',required=False, help='[Optional][Default:False] Use file names as header rather than the header in the file. Note that if file_name_as_header=False, then first line will be taken as a header.')
+    
     args=parser.parse_args()
     args.idx_to_keep -= 1 # make it 0-indexed
     if args.files==['-']: # Note: nargs='*' variable is a list
@@ -62,16 +66,46 @@ if __name__ == '__main__':
     else:
         all_files=args.files
 
+    if args.working_directory != '.': # append the working directory
+        args.working_directory=args.working_directory.rstrip('/')
+        all_files=[f'{args.working_directory}/{f}' for f in all_files]
+        
+    #print('\n'.join(all_files))
+    all_files_L=[]
+    import glob
+    for f in all_files:
+        all_files_L.extend(glob.glob(f))
+
+    # insure that all files exist # but after glob        
+    import os    
+    for f in all_files_L:
+        if not os.path.isfile(f) :
+            error(f'File {f} does not exist.')
+
+    all_files=all_files_L
+
+    HEADER=0
+    if args.file_name_as_header:
+        HEADER=None
+
     try:
-        df_from_each_file=(pd.read_csv(f,index_col=0,sep='\t',header=None, usecols=[0,args.idx_to_keep]) for f in all_files)
+        df_from_each_file=[]
+        pbar=ProgressBar()
+        
+        for f in pbar(all_files):
+            # header from file if the user specifies it or default it is the file name
+
+            df_from_each_file.append(pd.read_csv(f, index_col=0, sep='\t', header=HEADER, usecols=[0,args.idx_to_keep]))
+        #df_from_each_file=(pd.read_csv(f,index_col=0,sep='\t',header=None, usecols=[0,args.idx_to_keep]) for f in all_files)
     except ValueError:
         error('Error during file reading: check if the args.idx_to_keep is correct')
 
     df = pd.concat(df_from_each_file,axis=1, sort=False).fillna( args.missing_value ) ## join="inner" 
     # axis = 0 (column down/down) and axis=1 (row/right)
-    column_names=cleanup_filenames(all_files,args.sep_in_filename) # file names will be used for column headers (but only works if there is one column per file)
 
-    df.columns=column_names # filename is used as column name. Note: this will fail if there is more than one column
+    if args.file_name_as_header:
+        column_names=cleanup_filenames(all_files,args.sep_in_filename) # file names will be used for column headers (but only works if there is one column per file)
+        df.columns=column_names # filename is used as column name. Note: this will fail if there is more than one column
 
     ##nrows=df.count(axis=0) # row count
 
