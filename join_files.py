@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Nizar Batada nizar.batada "-at-" gmail dot com
+# Mon Dec 7, Added couple of options such as 1) working_directory 2) filename_as_header and 3) added progress bar
 # Tue Mar 17, 6pm. Allow filtering rows with certain prefixes (eg. __ambigous __too_low_aQual) that ht-seq will spit out
 # Tue Feb 11 21:32:06 2020
 # Mon May 4, Update: fix the column labeling issue (when input has more than two columns per file (need to take one usecols)
@@ -94,9 +95,7 @@ if __name__ == '__main__':
         
         for f in pbar(all_files):
             # header from file if the user specifies it or default it is the file name
-
             df_from_each_file.append(pd.read_csv(f, index_col=0, sep='\t', header=HEADER, usecols=[0,args.idx_to_keep]))
-        #df_from_each_file=(pd.read_csv(f,index_col=0,sep='\t',header=None, usecols=[0,args.idx_to_keep]) for f in all_files)
     except ValueError:
         error('Error during file reading: check if the args.idx_to_keep is correct')
 
@@ -118,14 +117,6 @@ if __name__ == '__main__':
 
     if args.ignore_keys_prefix:
         df = df[df.index.startswith(args.ignore_keys_prefix)==False]
-        # find all keys that starts with this prefix
-        ## rownames_to_discard=[]
-        ## for rowname in df.index:
-        ##    if rowname.startswith(args.ignore_keys_prefix):
-        ##        rownames_to_discard.append(rowname)
-        ## if len(rownames_to_discard)>0:
-        ##    df.drop(index=rownames_to_discard, inplace=True)
-    ##nrows_after=df.count(axis=0)
 
     df.index.name="ID" # set the header name of the rownames     
     df.sort_index(inplace=True) # sort by rownames
