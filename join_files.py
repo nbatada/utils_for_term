@@ -104,7 +104,6 @@ if __name__ == '__main__':
 
     df = pd.concat(df_from_each_file,axis=1, sort=False).fillna( args.missing_value ) ## join="inner" 
     
-    sys.stderr.write(f'Joined data frame has {df.shape}.\n')
     # axis = 0 (column down/down) and axis=1 (row/right)
 
     if args.file_name_as_header:
@@ -130,6 +129,8 @@ if __name__ == '__main__':
 
     if args.ignore_keys_prefix:
         df = df[df.index.startswith(args.ignore_keys_prefix)==False]
+
+    sys.stderr.write(f'Joined data frame has dimensions: {df.shape}.\n')
 
     df.index.name="ID" # set the header name of the rownames     
     df.sort_index(inplace=True) # sort by rownames
